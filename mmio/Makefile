@@ -12,14 +12,14 @@ default: $(HEX) $(DUMP) $(LNX_EXE)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.o: %.S
-	$(CC) $(CFLAGS) -c $< -o $@
-
-%.elf: %.o init.o ../link.ld
-	$(CC) init.o $< -static -nostdlib -T../link.ld -o $@
+%.elf: %.o ../init.S ../link.ld
+	$(CC) ../init.S $< -static -nostdlib -T../link.ld -o $@
 
 %.hex: %.elf
 	elf2hex 16 32768 $< > $@
 
 %.dump: %.elf
 	$(OBJDUMP) -D $< > $@
+
+clean:
+	rm -f *.o *.elf *.hex *.dump
