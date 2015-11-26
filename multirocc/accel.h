@@ -36,30 +36,14 @@ static inline unsigned long translator_virt_to_phys(void *vaddr)
 	return paddr;
 }
 
-static inline void blockstore_load(void *memaddr)
+static inline unsigned long count_chars(char *start, char needle)
 {
+	unsigned long count;
 	asm volatile ("fence");
-	asm volatile ("custom2 0, %[memaddr], 0, 0" :: [memaddr] "r" (memaddr));
-}
-
-static inline void blockstore_flush(void *memaddr)
-{
-	asm volatile ("custom2 0, %[memaddr], 0, 1" :: [memaddr] "r" (memaddr));
-	asm volatile ("fence");
-}
-
-static inline unsigned long blockstore_read(int regaddr)
-{
-	unsigned long value;
-	asm volatile ("custom2 %[value], %[regaddr], 0, 2" :
-			[value] "=r" (value) : [regaddr] "r" (regaddr));
-	return value;
-}
-
-static inline void blockstore_write(int regaddr, unsigned long value)
-{
-	asm volatile ("custom2 0, %[addr], %[value], 3" ::
-			[value] "r" (value), [addr] "r" (regaddr));
+	asm volatile ("custom2 %[count], %[start], %[needle], 0" :
+			[count] "=r" (count) :
+			[start] "r" (start), [needle] "r" (needle));
+	return count;
 }
 
 #endif

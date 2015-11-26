@@ -1,4 +1,4 @@
-BM_TESTS=accum-test blockstore-test
+BM_TESTS=accum-test charcount-test
 PK_TESTS=translator-test
 
 HEADERS=accel.h
