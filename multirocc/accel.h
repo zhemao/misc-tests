@@ -28,29 +28,37 @@ static inline void accum_add(int addr, unsigned long addend)
 			[addend] "r" (addend), [addr] "r" (addr));
 }
 
+static inline unsigned long translator_virt_to_phys(void *vaddr)
+{
+	unsigned long paddr;
+	asm volatile ("custom1 %[paddr], %[vaddr], 0, 0" :
+			[paddr] "=r" (paddr) : [vaddr] "r" (vaddr));
+	return paddr;
+}
+
 static inline void blockstore_load(void *memaddr)
 {
 	asm volatile ("fence");
-	asm volatile ("custom1 0, %[memaddr], 0, 0" :: [memaddr] "r" (memaddr));
+	asm volatile ("custom2 0, %[memaddr], 0, 0" :: [memaddr] "r" (memaddr));
 }
 
 static inline void blockstore_flush(void *memaddr)
 {
-	asm volatile ("custom1 0, %[memaddr], 0, 1" :: [memaddr] "r" (memaddr));
+	asm volatile ("custom2 0, %[memaddr], 0, 1" :: [memaddr] "r" (memaddr));
 	asm volatile ("fence");
 }
 
 static inline unsigned long blockstore_read(int regaddr)
 {
 	unsigned long value;
-	asm volatile ("custom1 %[value], %[regaddr], 0, 2" :
+	asm volatile ("custom2 %[value], %[regaddr], 0, 2" :
 			[value] "=r" (value) : [regaddr] "r" (regaddr));
 	return value;
 }
 
 static inline void blockstore_write(int regaddr, unsigned long value)
 {
-	asm volatile ("custom1 0, %[addr], %[value], 3" ::
+	asm volatile ("custom2 0, %[addr], %[value], 3" ::
 			[value] "r" (value), [addr] "r" (regaddr));
 }
 
