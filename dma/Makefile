@@ -1,12 +1,4 @@
-CC=riscv64-unknown-linux-gnu-gcc
-CFLAGS=-Wall -O2
+PK_TESTS=simple-test matrix-test
+HEADERS=dma-ext.h
 
-TESTS = simple-test matrix-test
-
-all: $(TESTS)
-
-%: %.c dma-ext.h
-	$(CC) $(CFLAGS) $< -static -o $@
-
-clean:
-	rm -rf $(TESTS)
+include ../Makefrag
