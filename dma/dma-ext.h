@@ -9,21 +9,21 @@
 
 static inline void dma_set_cr(int crnum, unsigned long value)
 {
-	asm volatile ("custom0 0, %[addr], %[data], 4" ::
+	asm volatile ("custom2 0, %[addr], %[data], 4" ::
 			[addr] "r" (crnum), [data] "r" (value));
 }
 
 static inline unsigned long dma_get_cr(int crnum)
 {
 	unsigned long value;
-	asm volatile ("custom0 %[value], %[addr], 0, 5" :
+	asm volatile ("custom2 %[value], %[addr], 0, 5" :
 			[value] "=r" (value) : [addr] "r" (crnum));
 	return value;
 }
 
 static inline void dma_transfer(void *dst, void *src)
 {
-	asm volatile ("custom0 0, %[dst], %[src], 0" ::
+	asm volatile ("custom2 0, %[dst], %[src], 0" ::
 			[dst] "r" (dst), [src] "r" (src));
 }
 
