@@ -1,4 +1,4 @@
-CFLAGS=-Wall -O1
+CFLAGS=-Wall -O1 -march=IMAFDXcustom
 CC=riscv64-unknown-linux-gnu-gcc
 OBJDUMP=riscv64-unknown-linux-gnu-objdump
 
