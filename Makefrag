@@ -1,5 +1,5 @@
 CFLAGS=-Wall -O1 -march=IMAFDXcustom
-CC=riscv64-unknown-linux-gnu-gcc
+CC=riscv64-unknown-elf-gcc
 OBJDUMP=riscv64-unknown-linux-gnu-objdump
 
 HEX=$(addsuffix .hex,$(BM_TESTS))
