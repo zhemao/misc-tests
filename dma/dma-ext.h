@@ -27,4 +27,14 @@ static inline void dma_transfer(void *dst, void *src)
 			[dst] "r" (dst), [src] "r" (src));
 }
 
+static inline void dma_read_prefetch(void *dst)
+{
+	asm volatile ("custom2 0, %[dst], 0, 2" :: [dst] "r" (dst));
+}
+
+static inline void dma_write_prefetch(void *dst)
+{
+	asm volatile ("custom2 0, %[dst], 0, 3" :: [dst] "r" (dst));
+}
+
 #endif
