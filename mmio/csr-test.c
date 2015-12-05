@@ -1,6 +1,6 @@
 #define MSCRATCH 0x340
-#define CSR0_BASE (1 << 30)
-#define SCR_BASE ((1 << 30) | (1 << 15))
+#define CSR0_BASE ((1 << 30) | (1 << 15))
+#define SCR_BASE ((1 << 30) | (1 << 16))
 
 #define NCORES 1
 #define MEM_MB (CSR0_BASE >> 20)
