@@ -3,5 +3,5 @@ HEADERS=dataset.h ../include/util.h
 
 include ../Makefrag
 
-dataset.h: gendata.py
-	python gendata.py 1024 16384 > $@
+dataset.h: saxpy_gendata.py
+	python saxpy_gendata.py > $@

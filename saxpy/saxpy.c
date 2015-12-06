@@ -31,18 +31,15 @@ int check_result(float *res, float *check, int n)
 
 int main(int argc, char *argv[])
 {
-	int i;
 	unsigned long starttime, endtime;
 
 	printf("starting saxpy benchmark\n");
 
 	starttime = rdtime();
-	for (i = 0; i < X_SIZE; i += Y_SIZE) {
-		saxpy(a_data, x_data + i, y_data, Y_SIZE);
-	}
+	saxpy(input_data_a, input_data_X, input_data_Y, DATA_SIZE);
 	endtime = rdtime();
 
-	if (check_result(y_data, check_data, Y_SIZE)) {
+	if (check_result(input_data_Y, verify_data, DATA_SIZE)) {
 		fprintf(stderr, "results do not match expected\n");
 		exit(EXIT_FAILURE);
 	}
