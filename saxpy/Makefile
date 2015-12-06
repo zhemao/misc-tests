@@ -1,5 +1,5 @@
-PK_TESTS=saxpy-benchmark
-HEADERS=util.h dataset.h
+PK_TESTS=saxpy
+HEADERS=dataset.h ../include/util.h
 
 include ../Makefrag
 

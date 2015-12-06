@@ -1,4 +1,4 @@
 PK_TESTS=simple-test matrix-test prefetch-test
-HEADERS=dma-ext.h
+HEADERS=../include/dma-ext.h ../include/util.h
 
 include ../Makefrag
