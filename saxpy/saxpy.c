@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TOL 0.0000001
+
 void saxpy(float a, float *x, float *y, int n)
 {
 	int i;
@@ -12,18 +14,38 @@ void saxpy(float a, float *x, float *y, int n)
 		y[i] += a * x[i];
 }
 
+int check_result(float *res, float *check, int n)
+{
+	int i;
+	float dist;
+
+	for (i = 0; i < n; i++) {
+		dist = res[i] - check[i];
+		dist = dist * dist;
+		if (dist > TOL)
+			return -1;
+	}
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	int i;
 	unsigned long starttime, endtime;
 
-	printf("starting saxpy benchmark");
+	printf("starting saxpy benchmark\n");
 
 	starttime = rdtime();
 	for (i = 0; i < X_SIZE; i += Y_SIZE) {
 		saxpy(a_data, x_data + i, y_data, Y_SIZE);
 	}
 	endtime = rdtime();
+
+	if (check_result(y_data, check_data, Y_SIZE)) {
+		fprintf(stderr, "results do not match expected\n");
+		exit(EXIT_FAILURE);
+	}
 
 	printf("saxpy took %lu ticks\n", endtime - starttime);
 
