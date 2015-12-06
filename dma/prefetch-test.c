@@ -5,25 +5,18 @@
 
 #define TEST_SIZE 4096
 
-unsigned long get_time(void)
-{
-	unsigned long time;
-	asm volatile ("rdtime %[time]" : [time] "=r" (time));
-	return time;
-}
-
 unsigned long read_block(char *data)
 {
 	unsigned long start, end;
 	char value;
 
-	start = get_time();
+	start = rdtime();
 	for (int i = 0; i < TEST_SIZE; i++) {
 		value = data[i];
 		if (value != 0)
 			return -1;
 	}
-	end = get_time();
+	end = rdtime();
 
 	return end - start;
 }
@@ -32,10 +25,10 @@ unsigned long write_block(char *data)
 {
 	unsigned long start, end;
 
-	start = get_time();
+	start = rdtime();
 	for (int i = 0; i < TEST_SIZE; i++)
 		data[i] = (i & 0xff);
-	end = get_time();
+	end = rdtime();
 
 	return end - start;
 }
