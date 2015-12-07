@@ -7,29 +7,25 @@
 #include <string.h>
 
 #define TOL 0.0000001
+#define NTRIALS 3
+#define SIZE_STEP 500
 
-void saxpy(float a, float *x, float *y, int n, size_t pf_size)
+void saxpy(float a, float *x, float *y, int n, int prefetch)
 {
 	int i;
 
-	dma_set_cr(SRC_STRIDE, 0);
-	dma_set_cr(DST_STRIDE, 0);
-	dma_set_cr(SEGMENT_SIZE, pf_size * sizeof(float));
-	dma_set_cr(NSEGMENTS, 1);
+	if (prefetch) {
+		dma_set_cr(SRC_STRIDE, 0);
+		dma_set_cr(DST_STRIDE, 0);
+		dma_set_cr(SEGMENT_SIZE, n * sizeof(float));
+		dma_set_cr(NSEGMENTS, 1);
 
-	if (pf_size == n) {
 		dma_read_prefetch(x);
 		dma_write_prefetch(y);
-		pf_size = 0;
 	}
 
-	for (i = 0; i < n; i++) {
-		if (pf_size > 0 && i % pf_size == 0 && i + pf_size < n) {
-			dma_read_prefetch(&x[i + pf_size]);
-			dma_write_prefetch(&y[i + pf_size]);
-		}
+	for (i = 0; i < n; i++)
 		y[i] += a * x[i];
-	}
 }
 
 int check_result(float *res, float *check, int n)
@@ -47,55 +43,52 @@ int check_result(float *res, float *check, int n)
 	return 0;
 }
 
-unsigned long time_saxpy(int pf_size)
+unsigned long time_saxpy(int n, int prefetch)
 {
-	unsigned long starttime, endtime;
+	unsigned long starttime, endtime, totaltime = 0;
 	float y[DATA_SIZE];
+	int trial;
 
-	memcpy(y, input_data_Y, DATA_SIZE * sizeof(float));
+	for (trial = 0; trial < NTRIALS; trial++) {
+		memcpy(y, input_data_Y, n * sizeof(float));
 
-	starttime = rdtime();
-	saxpy(input_data_a, input_data_X, y, DATA_SIZE, pf_size);
-	endtime = rdtime();
+		starttime = rdtime();
+		saxpy(input_data_a, input_data_X, y, n, prefetch);
+		endtime = rdtime();
 
-	if (check_result(y, verify_data, DATA_SIZE)) {
-		fprintf(stderr, "results do not match expected\n");
-		exit(EXIT_FAILURE);
+		totaltime += (endtime - starttime);
 	}
 
-	return endtime - starttime;
-}
-
-#define BLOCK_SIZE 16
-
-static inline int benchmark_done(int blocks)
-{
-	unsigned long pf_size = blocks * BLOCK_SIZE;
-	unsigned long test_size = DATA_SIZE * sizeof(float);
-	return pf_size > (test_size / 2);
+	return totaltime / NTRIALS;
 }
 
 int main(int argc, char *argv[])
 {
-	unsigned long bm_time, last_time;
-	int blocks;
+	unsigned long pf_time, npf_time;
+	int n;
+	FILE *f = NULL;
 
 	printf("starting saxpy benchmark\n");
 
-	bm_time = time_saxpy(0);
-	printf("no prefetching: %lu ticks\n", bm_time);
-
-	for (blocks = 1; !benchmark_done(blocks); blocks *= 2) {
-		last_time = bm_time;
-		bm_time = time_saxpy(BLOCK_SIZE * blocks);
-		printf("prefetch %d blocks: %lu ticks\n", blocks, bm_time);
-		// stop the test once we are no longer getting faster
-		if (bm_time > last_time)
-			break;
+	if (argc > 1) {
+		printf("writing output to %s\n", argv[1]);
+		f = fopen(argv[1], "w");
+		if (f == NULL) {
+			perror("fopen");
+			exit(EXIT_FAILURE);
+		}
 	}
 
-	bm_time = time_saxpy(DATA_SIZE);
-	printf("full prefetch: %lu ticks\n", bm_time);
+
+	for (n = SIZE_STEP; n <= DATA_SIZE; n += SIZE_STEP) {
+		npf_time = time_saxpy(n, 0);
+		pf_time = time_saxpy(n, 1);
+		printf("n = %d, no prefetch time = %lu, prefetch time = %lu\n",
+				n, npf_time, pf_time);
+		if (f) fprintf(f, "%d,%lu,%lu\n", n, npf_time, pf_time);
+	}
+
+	if (f) fclose(f);
 
 	return 0;
 }

@@ -5,31 +5,25 @@
 #include <stdlib.h>
 
 #define TOL 0.0000001
-#define PREFETCH_SIZE 0
+#define PREFETCH
 #define TEST_SIZE 128
 
-void saxpy(float a, float *x, float *y, int n, size_t pf_size)
+void saxpy(float a, float *x, float *y, int n)
 {
 	int i;
 
+#ifdef PREFETCH
 	dma_set_cr(SRC_STRIDE, 0);
 	dma_set_cr(DST_STRIDE, 0);
-	dma_set_cr(SEGMENT_SIZE, pf_size * sizeof(float));
+	dma_set_cr(SEGMENT_SIZE, n * sizeof(float));
 	dma_set_cr(NSEGMENTS, 1);
 
-	if (pf_size == n) {
-		dma_read_prefetch(x);
-		dma_write_prefetch(y);
-		pf_size = 0;
-	}
+	dma_read_prefetch(x);
+	dma_write_prefetch(y);
+#endif
 
-	for (i = 0; i < n; i++) {
-		if (pf_size > 0 && i % pf_size == 0 && i + pf_size < n) {
-			dma_read_prefetch(&x[i + pf_size]);
-			dma_write_prefetch(&y[i + pf_size]);
-		}
+	for (i = 0; i < n; i++)
 		y[i] += a * x[i];
-	}
 }
 
 int check_result(float *res, float *check, int n)
@@ -49,8 +43,7 @@ int check_result(float *res, float *check, int n)
 
 int main(int argc, char *argv[])
 {
-	saxpy(input_data_a, input_data_X, input_data_Y,
-			TEST_SIZE, PREFETCH_SIZE);
+	saxpy(input_data_a, input_data_X, input_data_Y, TEST_SIZE);
 
 	if (check_result(input_data_Y, verify_data, TEST_SIZE))
 		return -1;
