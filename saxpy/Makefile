@@ -1,6 +1,6 @@
 PK_TESTS=saxpy-benchmark
 BM_TESTS=saxpy-test
-HEADERS=dataset.h ../include/util.h ../include/dma-ext.h
+HEADERS=dataset.h test-settings.h ../include/util.h ../include/dma-ext.h
 
 include ../Makefrag
 

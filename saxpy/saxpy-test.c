@@ -1,12 +1,11 @@
 #include "util.h"
 #include "dataset.h"
 #include "dma-ext.h"
+#include "test-settings.h"
 
 #include <stdlib.h>
 
 #define TOL 0.0000001
-#define PREFETCH
-#define TEST_SIZE 128
 
 void saxpy(float a, float *x, float *y, int n)
 {
