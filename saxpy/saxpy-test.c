@@ -6,7 +6,7 @@
 
 #define TOL 0.0000001
 #define PREFETCH_SIZE 0
-#define TEST_SIZE 1000
+#define TEST_SIZE 128
 
 void saxpy(float a, float *x, float *y, int n, size_t pf_size)
 {
@@ -16,6 +16,12 @@ void saxpy(float a, float *x, float *y, int n, size_t pf_size)
 	dma_set_cr(DST_STRIDE, 0);
 	dma_set_cr(SEGMENT_SIZE, pf_size * sizeof(float));
 	dma_set_cr(NSEGMENTS, 1);
+
+	if (pf_size == n) {
+		dma_read_prefetch(x);
+		dma_write_prefetch(y);
+		pf_size = 0;
+	}
 
 	for (i = 0; i < n; i++) {
 		if (pf_size > 0 && i % pf_size == 0 && i + pf_size < n) {

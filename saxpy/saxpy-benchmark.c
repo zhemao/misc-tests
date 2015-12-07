@@ -17,6 +17,12 @@ void saxpy(float a, float *x, float *y, int n, size_t pf_size)
 	dma_set_cr(SEGMENT_SIZE, pf_size * sizeof(float));
 	dma_set_cr(NSEGMENTS, 1);
 
+	if (pf_size == n) {
+		dma_read_prefetch(x);
+		dma_write_prefetch(y);
+		pf_size = 0;
+	}
+
 	for (i = 0; i < n; i++) {
 		if (pf_size > 0 && i % pf_size == 0 && i + pf_size < n) {
 			dma_read_prefetch(&x[i + pf_size]);
@@ -61,11 +67,17 @@ unsigned long time_saxpy(int pf_size)
 }
 
 #define BLOCK_SIZE 16
-#define MAX_PREFETCH_BLOCKS 8
+
+static inline int benchmark_done(int blocks)
+{
+	unsigned long pf_size = blocks * BLOCK_SIZE;
+	unsigned long test_size = DATA_SIZE * sizeof(float);
+	return pf_size > (test_size / 2);
+}
 
 int main(int argc, char *argv[])
 {
-	unsigned long bm_time;
+	unsigned long bm_time, last_time;
 	int blocks;
 
 	printf("starting saxpy benchmark\n");
@@ -73,10 +85,17 @@ int main(int argc, char *argv[])
 	bm_time = time_saxpy(0);
 	printf("no prefetching: %lu ticks\n", bm_time);
 
-	for (blocks = 1; blocks <= MAX_PREFETCH_BLOCKS; blocks *= 2) {
+	for (blocks = 1; !benchmark_done(blocks); blocks *= 2) {
+		last_time = bm_time;
 		bm_time = time_saxpy(BLOCK_SIZE * blocks);
 		printf("prefetch %d blocks: %lu ticks\n", blocks, bm_time);
+		// stop the test once we are no longer getting faster
+		if (bm_time > last_time)
+			break;
 	}
+
+	bm_time = time_saxpy(DATA_SIZE);
+	printf("full prefetch: %lu ticks\n", bm_time);
 
 	return 0;
 }
