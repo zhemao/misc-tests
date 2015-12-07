@@ -1,5 +1,5 @@
 PK_TESTS=saxpy
-HEADERS=dataset.h ../include/util.h
+HEADERS=dataset.h ../include/util.h ../include/dma-ext.h
 
 include ../Makefrag
 
