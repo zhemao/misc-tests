@@ -18,7 +18,7 @@ void saxpy(float a, float *x, float *y, int n, size_t pf_size)
 	dma_set_cr(NSEGMENTS, 1);
 
 	for (i = 0; i < n; i++) {
-		if (pf_size > 0 && i + pf_size < n) {
+		if (pf_size > 0 && i % pf_size == 0 && i + pf_size < n) {
 			dma_read_prefetch(&x[i + pf_size]);
 			dma_write_prefetch(&y[i + pf_size]);
 		}
