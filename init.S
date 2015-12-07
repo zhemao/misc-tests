@@ -6,9 +6,11 @@ _start:
   // don't proceed if hartid isn't 0
   csrr a0, mhartid
   bnez a0, extra_core
-  // enable RoCC accelerator
-  li a0, 0xC000
+  // enable RoCC accelerator and FPU
+  li a0, 0xF000
   csrs mstatus, a0
+  // initialize the FPU
+  csrwi fcsr, 0
   // init stack pointer
   li sp, 0x20000000
   // call C code
