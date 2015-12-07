@@ -44,8 +44,10 @@ int main(int argc, char *argv[])
 {
 	saxpy(input_data_a, input_data_X, input_data_Y, TEST_SIZE);
 
+#ifdef VERIFY
 	if (check_result(input_data_Y, verify_data, TEST_SIZE))
 		return -1;
+#endif
 
 	return 0;
 }

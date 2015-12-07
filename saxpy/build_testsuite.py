@@ -18,7 +18,8 @@ def build_test(prefetch, size):
     shutil.copyfile("saxpy-test.hex", testname)
 
 def main():
-    os.mkdir("tests")
+    if not os.path.isdir("tests"):
+        os.mkdir("tests")
     for size in range(SIZE_STEP, DATA_SIZE + 1, SIZE_STEP):
         build_test(False, size)
         build_test(True, size)
