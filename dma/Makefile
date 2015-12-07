@@ -1,4 +1,5 @@
-PK_TESTS=simple-test matrix-test prefetch-test
+PK_TESTS=simple-pk matrix-pk prefetch-pk
+BM_TESTS=simple-bm matrix-bm prefetch-bm
 HEADERS=../include/dma-ext.h ../include/util.h
 
 include ../Makefrag
