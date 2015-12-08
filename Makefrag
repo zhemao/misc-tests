@@ -1,11 +1,13 @@
-CFLAGS=-Wall -O1 -march=IMAFDXcustom
-CC=riscv64-unknown-elf-gcc
+CFLAGS=-Wall -O1 -I../include
+CC=riscv64-unknown-linux-gnu-gcc
 OBJDUMP=riscv64-unknown-linux-gnu-objdump
 
 HEX=$(addsuffix .hex,$(BM_TESTS))
 DUMP=$(addsuffix .dump,$(BM_TESTS))
 
 OUTPUTS=$(PK_TESTS) $(HEX) $(DUMP)
+
+OBJS=$(addsuffix .o,$(BM_TESTS) $(PK_TESTS))
 
 all: $(OUTPUTS)
 
@@ -15,7 +17,7 @@ all: $(OUTPUTS)
 %.dump: %.elf
 	$(OBJDUMP) -D $< > $@
 
-%.o: %.c $(HEADERS)
+$(OBJS): %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.elf: %.o ../init.S ../link.ld
@@ -25,4 +27,4 @@ $(PK_TESTS): %: %.o
 	$(CC) $< -static -o $@
 
 clean:
-	rm -f $(OUTPUTS)
+	rm -f $(OUTPUTS) *.o
