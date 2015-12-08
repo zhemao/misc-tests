@@ -6,6 +6,13 @@
 #include <stdlib.h>
 
 #define TOL 0.0000001
+#define PREFETCH_LOOKAHEAD 128
+#define PREFETCH_SIZE 4096
+
+static inline int prefetch_needed(int i, int n)
+{
+	return i % PREFETCH_SIZE == 0 && (i + PREFETCH_LOOKAHEAD) < n;
+}
 
 void saxpy(float a, float *x, float *y, int n)
 {
@@ -14,15 +21,19 @@ void saxpy(float a, float *x, float *y, int n)
 #ifdef PREFETCH
 	dma_set_cr(SRC_STRIDE, 0);
 	dma_set_cr(DST_STRIDE, 0);
-	dma_set_cr(SEGMENT_SIZE, n * sizeof(float));
+	dma_set_cr(SEGMENT_SIZE, PREFETCH_SIZE * sizeof(float));
 	dma_set_cr(NSEGMENTS, 1);
-
-	dma_read_prefetch(x);
-	dma_write_prefetch(y);
 #endif
 
-	for (i = 0; i < n; i++)
+	for (i = 0; i < n; i++) {
+#ifdef PREFETCH
+		if (prefetch_needed(i, n)) {
+			dma_write_prefetch(&y[i + PREFETCH_LOOKAHEAD]);
+			dma_read_prefetch(&x[i + PREFETCH_LOOKAHEAD]);
+		}
+#endif
 		y[i] += a * x[i];
+	}
 }
 
 int check_result(float *res, float *check, int n)
