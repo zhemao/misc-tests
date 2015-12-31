@@ -7,4 +7,10 @@ static inline unsigned long rdtime(void) {
 	return timeval;
 }
 
+static inline unsigned long rdcycle(void) {
+	unsigned long cycles;
+	asm volatile ("rdcycle %[cycles]\n" : [cycles] "=r" (cycles));
+	return cycles;
+}
+
 #endif
