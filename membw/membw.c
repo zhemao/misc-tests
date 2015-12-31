@@ -4,23 +4,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int result[DATA_SIZE];
+int result[RES_SIZE];
 
-void membw(int *res, int a, int *x, int n)
+void membw(int *res, int *x, int *k, int n)
 {
 	int i;
 
 	for (i = 0; i < n; i++)
-		res[i]= a * x[i];
+		res[i] = x[k[i]];
 }
 
-int verify(int *res, int *verify, int n)
+int verify(int *res, int *ver, int n)
 {
 	int i;
 
 	for (i = 0; i < n; i++)
-		if (res[i] != verify[i]) {
-			fprintf("data doesn't match at %d\n", i);
+		if (res[i] != ver[i]) {
+			fprintf(stderr, "data doesn't match at %d\n", i);
 			return -1;
 		}
 
@@ -29,20 +29,13 @@ int verify(int *res, int *verify, int n)
 
 int main(int argc, char *argv[])
 {
-	int testn;
 	unsigned long start, end;
 
-	if (argc < 2) {
-		fprintf(stderr, "Usage: %s n\n", argv[0]);
-		return -1;
-	}
-
-	testn = atoi(argv[1]);
 	start = rdcycle();
-	membw(result, input_data_a, input_data_X, testn);
+	membw(result, input_data_X, input_data_K, RES_SIZE);
 	end = rdcycle();
 
-	printf("time[%d] = %lu\n", testn, end - start);
+	printf("time[%d, %d] = %lu\n", DATA_SIZE, RES_SIZE, end - start);
 
-	return 0;
+	return verify(result, verify_data, RES_SIZE);
 }

@@ -1,14 +1,15 @@
 import random
 
 data_size = 65536
+res_size = 4096
 
-a = int(random.random()*1000.00)
 X = [int(random.random()*1000.00) for x in range(data_size)]
+K = [int(random.random()*data_size) for k in range(res_size)]
 
 result = []
 
-for i in range(data_size):
-    result.append(a*X[i])
+for k in K:
+    result.append(X[k])
 
 
 def print_arr(array_type, array_name, array_sz, pyarr):
@@ -18,14 +19,11 @@ def print_arr(array_type, array_name, array_sz, pyarr):
     print "};"
 
 
-def print_scalar(scalar_type, scalar_name, pyscalar):
-    print "{} {} = {};".format(scalar_type, scalar_name, pyscalar)
-
 print "#define DATA_SIZE {}".format(data_size)
-
-print_scalar("int", "input_data_a", a)
+print "#define RES_SIZE {}".format(res_size)
 
 print_arr("int", "input_data_X", "DATA_SIZE", X)
+print_arr("int", "input_data_K", "RES_SIZE", K)
 
-print_arr("int", "verify_data", "DATA_SIZE", result)
+print_arr("int", "verify_data", "RES_SIZE", result)
 
