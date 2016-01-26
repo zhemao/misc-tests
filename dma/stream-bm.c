@@ -1,6 +1,6 @@
 #include "dma-ext.h"
 
-#define STREAM_LOOPBACK_BASE ((1 << 30) | (1 << 29))
+#define STREAM_LOOPBACK_BASE ((1 << 30) | (1 << 29) | (1 << 6))
 #define TEST_SIZE 52
 #define ARRAY_SIZE 64
 
@@ -15,11 +15,9 @@ int main(void)
 	for (i = 0; i < ARRAY_SIZE; i++)
 		source[i] = i * 4;
 
-	dma_set_cr(SRC_STRIDE, 0);
-	dma_set_cr(DST_STRIDE, 0);
-	dma_set_cr(SEGMENT_SIZE, TEST_SIZE * sizeof(long));
-	dma_set_cr(NSEGMENTS, 1);
-	dma_set_cr(WORD_SIZE, WSZ_LONG);
+	dma_set_segsize(TEST_SIZE * sizeof(long));
+	dma_set_nsegments(1);
+	dma_set_wordsize(WSZ_LONG);
 
 	dma_stream_out(stream_base, source);
 	dma_stream_in(dest, stream_base);

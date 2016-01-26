@@ -13,18 +13,36 @@
 #define WSZ_INT 2
 #define WSZ_LONG 3
 
-static inline void dma_set_cr(int crnum, unsigned long value)
+static inline void dma_set_segsize(unsigned long segment_size)
 {
-	asm volatile ("custom2 0, %[addr], %[data], 8" ::
-			[addr] "r" (crnum), [data] "r" (value));
+	asm volatile ("csrw 0x802, %[value]" :: [value] "r" (segment_size));
 }
 
-static inline unsigned long dma_get_cr(int crnum)
+static inline void dma_set_nsegments(unsigned long nsegments)
 {
-	unsigned long value;
-	asm volatile ("custom2 %[value], %[addr], 0, 9" :
-			[value] "=r" (value) : [addr] "r" (crnum));
-	return value;
+	asm volatile ("csrw 0x803, %[value]" :: [value] "r" (nsegments));
+}
+
+static inline void dma_set_src_stride(unsigned long src_stride)
+{
+	asm volatile ("csrw 0x800, %[value]" :: [value] "r" (src_stride));
+}
+
+static inline void dma_set_dst_stride(unsigned long dst_stride)
+{
+	asm volatile ("csrw 0x801, %[value]" :: [value] "r" (dst_stride));
+}
+
+static inline void dma_set_wordsize(unsigned long word_size)
+{
+	asm volatile ("csrw 0x804, %[value]" :: [value] "r" (word_size));
+}
+
+static inline int dma_get_resp_status(void)
+{
+	int status;
+	asm volatile ("csrr 0x805, %[value]" : [value] "=r" (status));
+	return status;
 }
 
 static inline void dma_transfer(void *dst, void *src)

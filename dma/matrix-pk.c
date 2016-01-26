@@ -1,7 +1,7 @@
 #include "dma-ext.h"
 #include <stdio.h>
 
-#define LARGE_SIZE 100
+#define LARGE_SIZE 25
 #define SMALL_SIZE 10
 
 #define ROW_START 10
@@ -22,10 +22,10 @@ void check_copy(int r, int c)
 
 void copy_data(void *dst, void *src, int dst_cols, int src_cols, int nrows)
 {
-	dma_set_cr(SEGMENT_SIZE, dst_cols * sizeof(int));
-	dma_set_cr(NSEGMENTS, nrows);
-	dma_set_cr(SRC_STRIDE, (src_cols - dst_cols) * sizeof(int));
-	dma_set_cr(DST_STRIDE, 0);
+	dma_set_segsize(dst_cols * sizeof(int));
+	dma_set_nsegments(nrows);
+	dma_set_src_stride((src_cols - dst_cols) * sizeof(int));
+	dma_set_dst_stride(0);
 
 	asm volatile ("fence");
 	dma_transfer(dst, src);

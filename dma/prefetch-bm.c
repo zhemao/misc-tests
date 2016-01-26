@@ -39,10 +39,10 @@ int main(void)
 {
 	unsigned long pf_time, npf_time;
 
-	dma_set_cr(SEGMENT_SIZE, TEST_SIZE);
-	dma_set_cr(NSEGMENTS, 1);
-	dma_set_cr(SRC_STRIDE, 0);
-	dma_set_cr(DST_STRIDE, 0);
+	dma_set_segsize(TEST_SIZE);
+	dma_set_nsegments(1);
+	dma_set_src_stride(0);
+	dma_set_dst_stride(0);
 
 	dma_read_prefetch(rd_section);
 	asm volatile ("fence");

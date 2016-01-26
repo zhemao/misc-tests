@@ -12,10 +12,10 @@ int main(void)
 
 	printf("Starting DMA test\n");
 
-	dma_set_cr(SEGMENT_SIZE, TEST_SIZE * sizeof(int));
-	dma_set_cr(NSEGMENTS, 1);
-	dma_set_cr(SRC_STRIDE, 0);
-	dma_set_cr(DST_STRIDE, 0);
+	dma_set_segsize(TEST_SIZE * sizeof(int));
+	dma_set_nsegments(1);
+	dma_set_src_stride(0);
+	dma_set_dst_stride(0);
 
 	for (i = 0; i < TEST_SIZE; i++)
 		src_array[i] = (i << 16) | i;
