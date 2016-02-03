@@ -50,8 +50,8 @@ int main(void)
 	npf_time = read_block((char *) rd_section + TEST_SIZE);
 	if (npf_time == -1 || pf_time == -1)
 		return 3;
-	if (pf_time > npf_time)
-		return 1;
+	//if (pf_time > npf_time)
+	//	return 1;
 
 	dma_write_prefetch(wr_section);
 	asm volatile ("fence");
@@ -59,8 +59,8 @@ int main(void)
 	npf_time = write_block(wr_section + TEST_SIZE);
 	if (npf_time == -1 || pf_time == -1)
 		return 3;
-	if (pf_time > npf_time)
-		return 2;
+	//if (pf_time > npf_time)
+	//	return 2;
 
 	return 0;
 }
